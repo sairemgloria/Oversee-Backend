@@ -103,11 +103,8 @@ const createAdmin = async (req, res, next) => {
       });
     }
   } catch (err) {
-    /* Display Error Message */
-    console.log(`Error: ${err}`);
-    return res.status(500).json({
-      message: "Server Error",
-    });
+    /* Display Errors in Middleware */
+    next(err);
   }
 };
 
@@ -128,7 +125,7 @@ const updateAdmin = async (req, res, next) => {
 
     /* Add Validation */
     if (!admin) {
-      return res.status(400);
+      res.status(400);
       throw new Error("Admin not found");
     }
 
@@ -138,6 +135,7 @@ const updateAdmin = async (req, res, next) => {
 
     res.status(200).json(updateAdmin);
   } catch (err) {
+    /* Display Errors in Middleware */
     next(err);
   }
 };
