@@ -140,9 +140,41 @@ const updateAdmin = async (req, res, next) => {
   }
 };
 
+const deleteAdmin = async (req, res, next) => {
+  /* Get Request ID */
+  const { id } = req.params;
+
+  /* Validation: Check ID Format */
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Admin ID",
+    });
+  }
+
+  try {
+    const admin = await Admin.findByIdAndDelete(id);
+
+    /* Validation: Check if admin exists. */
+    if (!admin) {
+      res.status(400);
+      throw new Error("Admin not found");
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Admin deleted successfully",
+    });
+  } catch (err) {
+    /* Display Errors in Middleware */
+    next(err);
+  }
+};
+
 module.exports = {
   getAllAdmin,
   getSelectedAdmin,
   createAdmin,
   updateAdmin,
+  deleteAdmin,
 };
