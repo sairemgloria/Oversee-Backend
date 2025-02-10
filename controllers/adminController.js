@@ -111,8 +111,40 @@ const createAdmin = async (req, res, next) => {
   }
 };
 
+const updateAdmin = async (req, res, next) => {
+  const { id } = req.params;
+  const postBody = req.body;
+
+  /* Validation: Check ID Format */
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Admin ID",
+    });
+  }
+
+  try {
+    const admin = await Admin.findById(id);
+
+    /* Add Validation */
+    if (!admin) {
+      return res.status(400);
+      throw new Error("Admin not found");
+    }
+
+    const updateAdmin = await Admin.findByIdAndUpdate(id, postBody, {
+      new: true,
+    });
+
+    res.status(200).json(updateAdmin);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getAllAdmin,
   getSelectedAdmin,
   createAdmin,
+  updateAdmin,
 };

@@ -3,6 +3,7 @@ const {
   getAllAdmin,
   getSelectedAdmin,
   createAdmin,
+  updateAdmin,
 } = require("../controllers/adminController");
 const router = express.Router();
 
@@ -10,5 +11,6 @@ const router = express.Router();
 router.get("/", getAllAdmin);
 router.get("/:id", getSelectedAdmin);
 router.post("/", createAdmin);
+router.put("/:id", updateAdmin);
 
 module.exports = router;
