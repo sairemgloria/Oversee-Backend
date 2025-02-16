@@ -83,6 +83,16 @@ const createAdmin = async (req, res, next) => {
       });
     }
 
+    /* Check if Admin Existing (Email) */
+    const existingAdmin = await Admin.findOne({ email });
+    if (existingAdmin) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Admin with this email is already exist. Please provide another.",
+      });
+    }
+
     /* Business Logic */
     const admin = await Admin.create({
       name,
