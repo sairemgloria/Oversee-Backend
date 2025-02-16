@@ -63,16 +63,17 @@ const getSelectedAdmin = async (req, res) => {
 };
 
 const createAdmin = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, type } = req.body;
 
   try {
     /* Validation: Check input fields. */
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !type) {
       let missingFields = []; // Store missing fields.
 
       if (!name) missingFields.push("Name");
       if (!email) missingFields.push("Email");
       if (!password) missingFields.push("Password");
+      if (!type) missingFields.push("Type");
 
       return res.status(400).json({
         success: false,
@@ -87,6 +88,7 @@ const createAdmin = async (req, res, next) => {
       name,
       email,
       password,
+      type,
     });
 
     /* Create Condition */

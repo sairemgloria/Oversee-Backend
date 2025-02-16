@@ -13,6 +13,10 @@ const adminSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Password is required'],
+    },
+    type: {
+        type: String,
+        required: [true, "Account type is required"]
     }
 }, {
     timestamps: true
