@@ -8,7 +8,7 @@ const getAllAdmin = async (req, res) => {
     if (admin.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No admin found",
+        message: "No admin record found.",
       });
     }
 
