@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const adminSchema = new mongoose.Schema(
+const departmentAdminSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -8,13 +8,11 @@ const adminSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      unique: true,
       required: [true, "Email is required"],
     },
     password: {
       type: String,
       required: [true, "Password is required"],
-      //   select: false, // 🚀 Prevents password from being returned in queries by default
     },
     type: {
       type: String,
@@ -26,4 +24,4 @@ const adminSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Admin", adminSchema);
+module.exports = mongoose.model("departmentAdmin", departmentAdminSchema);

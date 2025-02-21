@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 /* Routes */
 app.use("/api/admins", require("./routes/adminRoutes"));
+app.use("/api/departmentAdmins", require("./routes/departmentAdminRoutes"));
 
 /* Error Handler */
 app.use(errorHandler);
