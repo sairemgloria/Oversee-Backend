@@ -122,9 +122,8 @@ const createAdmin = async (req, res, next) => {
 
 const updateAdmin = async (req, res, next) => {
   const { id } = req.params;
-  const postBody = req.body;
+  const { name, email, oldPassword, newPassword, type } = req.body;
 
-  /* Validation: Check ID Format */
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
@@ -135,19 +134,54 @@ const updateAdmin = async (req, res, next) => {
   try {
     const admin = await Admin.findById(id);
 
-    /* Add Validation */
     if (!admin) {
-      res.status(400);
-      throw new Error("Admin not found");
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
     }
 
-    const updateAdmin = await Admin.findByIdAndUpdate(id, postBody, {
-      new: true,
-    });
+    let updateData = { name, email, type };
 
-    res.status(200).json(updateAdmin);
+    // ✅ Require Old Password if a New Password is Provided
+    if (newPassword) {
+      if (!oldPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Old password is required to set a new password.",
+        });
+      }
+
+      // ✅ Check if the old password matches the stored password
+      if (admin.password !== oldPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Old password is incorrect.",
+        });
+      }
+
+      // ✅ Validate New Password Length
+      if (newPassword.trim().length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "New password must be at least 6 characters long.",
+        });
+      }
+
+      // ✅ Set New Password
+      updateData.password = newPassword;
+    }
+
+    const updatedAdmin = await Admin.findByIdAndUpdate(id, updateData, {
+      new: true,
+    }).select("-password"); // 👈 Exclude password from response
+
+    res.status(200).json({
+      success: true,
+      message: "Admin profile updated successfully!",
+      data: updatedAdmin,
+    });
   } catch (err) {
-    /* Display Errors in Middleware */
     next(err);
   }
 };
