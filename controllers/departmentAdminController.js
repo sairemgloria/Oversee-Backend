@@ -137,14 +137,6 @@ const updateDepartmentAdmin = async (req, res, next) => {
   /* Get all input field(s) */
   const { name, email, oldPassword, newPassword, type } = req.body;
 
-  /* Check if ID is missing in parameter */
-  if (!id) {
-    return res.status(400).json({
-      success: false,
-      message: "No Department Admin ID provided.",
-    });
-  }
-
   /* Validate: Check ID Format */
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
