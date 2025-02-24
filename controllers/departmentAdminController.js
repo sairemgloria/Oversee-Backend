@@ -200,9 +200,41 @@ const updateDepartmentAdmin = async (req, res, next) => {
   }
 };
 
+const deleteDepartmentAdmin = async (req, res, next) => {
+  /* Get Request ID */
+  const { id } = req.params;
+
+  /* Validation: Check ID Format */
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Department Admin ID",
+    });
+  }
+
+  try {
+    const deptAdmin = await department_admin.findByIdAndDelete(id);
+
+    /* Validation: Check if admin exists. */
+    if (!deptAdmin) {
+      res.status(400);
+      throw new Error("Department Admin not found.");
+    }
+
+    res.status(200).json({
+      success: true,
+      messsage: "Department Admin deleted successfully.",
+    });
+  } catch (err) {
+    /* Display Errors in Middleware */
+    next(err);
+  }
+};
+
 module.exports = {
   getAllDepartmentAdmin,
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,
   updateDepartmentAdmin,
+  deleteDepartmentAdmin,
 };

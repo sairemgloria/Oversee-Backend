@@ -4,6 +4,7 @@ const {
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,
   updateDepartmentAdmin,
+  deleteDepartmentAdmin,
 } = require("../controllers/departmentAdminController");
 const router = express.Router();
 
@@ -18,5 +19,12 @@ router.put("/", (req, res) => {
   });
 });
 router.put("/:id", updateDepartmentAdmin);
+router.delete("/", (req, res) => {
+  return res.status(400).json({
+    success: false,
+    message: "No Department Admin ID provided.",
+  });
+});
+router.delete("/:id", deleteDepartmentAdmin);
 
 module.exports = router;
