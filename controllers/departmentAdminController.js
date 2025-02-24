@@ -130,8 +130,25 @@ const createDepartmentAdmin = async (req, res) => {
   }
 };
 
+const updateDepartmentAdmin = async (req, res, next) => {
+  /* Get Request ID */
+  const { id } = req.params;
+
+  /* Get all input field(s) */
+  const { name, email, oldPassword, newPassword, type } = req.body;
+
+  /* Validate: Check ID Format */
+  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Department Admin ID",
+    });
+  }
+};
+
 module.exports = {
   getAllDepartmentAdmin,
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,
+  updateDepartmentAdmin,
 };

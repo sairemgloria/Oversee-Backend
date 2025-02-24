@@ -3,6 +3,7 @@ const {
   getAllDepartmentAdmin,
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,
+  updateDepartmentAdmin,
 } = require("../controllers/departmentAdminController");
 const router = express.Router();
 
@@ -10,5 +11,6 @@ const router = express.Router();
 router.get("/", getAllDepartmentAdmin);
 router.get("/:id", getSelectedDepartmentAdmin);
 router.post("/", createDepartmentAdmin);
+router.put("/:id", updateDepartmentAdmin);
 
 module.exports = router;
