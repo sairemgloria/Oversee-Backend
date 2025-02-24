@@ -137,12 +137,74 @@ const updateDepartmentAdmin = async (req, res, next) => {
   /* Get all input field(s) */
   const { name, email, oldPassword, newPassword, type } = req.body;
 
+  /* Check if ID is missing in parameter */
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "No Department Admin ID provided.",
+    });
+  }
+
   /* Validate: Check ID Format */
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
       message: "Invalid Department Admin ID",
     });
+  }
+
+  try {
+    const deptAdmin = await department_admin.findById(id);
+
+    if (!deptAdmin) {
+      return res.status(404).json({
+        success: false,
+        message: "Department Admin not found",
+      });
+    }
+
+    let updateData = { name, email, type };
+
+    // ✅ Require Old Password if a New Password is Provided
+    if (newPassword) {
+      if (!oldPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Old password is required to set a new password.",
+        });
+      }
+
+      // ✅ Check if the old password matches the stored password
+      if (deptAdmin.password !== oldPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Old password is incorrect.",
+        });
+      }
+
+      // ✅ Validate New Password Length
+      if (newPassword.trim().length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "New password must be at least 6 characters long.",
+        });
+      }
+
+      // ✅ Set New Password
+      updateData.password = newPassword;
+    }
+
+    const updatedDeptAdmin = await department_admin
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .select("-password"); // 👈 Exclude password from response
+
+    res.status(200).json({
+      success: true,
+      message: "Department Admin updated successfully!",
+      data: updatedDeptAdmin,
+    });
+  } catch (err) {
+    next(err);
   }
 };
 
