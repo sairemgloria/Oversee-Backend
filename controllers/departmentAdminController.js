@@ -1,8 +1,8 @@
-const departmentAdmin = require("../models/departmentAdminModel");
+const department_admin = require("../models/departmentAdminModel");
 
 const getAllDepartmentAdmin = async (req, res) => {
   try {
-    const deptAdmin = await departmentAdmin.find();
+    const deptAdmin = await department_admin.find();
 
     /* Validation */
     if (deptAdmin.length === 0) {
@@ -38,7 +38,7 @@ const getSelectedDepartmentAdmin = async (req, res) => {
   }
 
   try {
-    const deptAdmin = await departmentAdmin.findById(id);
+    const deptAdmin = await department_admin.findById(id);
 
     /* Validaiton: Check if department admin exists */
     if (!deptAdmin) {
@@ -87,7 +87,7 @@ const createDepartmentAdmin = async (req, res) => {
     }
 
     /* Validation: Check if Department Admin existing (Email) */
-    const existingDepartmentAdmin = await departmentAdmin.findOne({ email });
+    const existingDepartmentAdmin = await department_admin.findOne({ email });
     if (existingDepartmentAdmin) {
       return res.status(409).json({
         success: false,
@@ -97,7 +97,7 @@ const createDepartmentAdmin = async (req, res) => {
     }
 
     /* Business Logic */
-    const deptAdmin = await departmentAdmin.create({
+    const deptAdmin = await department_admin.create({
       name,
       email,
       password,

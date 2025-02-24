@@ -29,4 +29,4 @@ const departmentAdminSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("departmentAdmin", departmentAdminSchema);
+module.exports = mongoose.model("department_admin", departmentAdminSchema);
