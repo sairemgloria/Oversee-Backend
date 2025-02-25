@@ -12,6 +12,7 @@ const router = express.Router();
 router.get("/", getAllDepartmentAdmin);
 router.get("/:id", getSelectedDepartmentAdmin);
 router.post("/", createDepartmentAdmin);
+
 router.put("/", (req, res) => {
   return res.status(400).json({
     success: false,
@@ -19,6 +20,7 @@ router.put("/", (req, res) => {
   });
 });
 router.put("/:id", updateDepartmentAdmin);
+
 router.delete("/", (req, res) => {
   return res.status(400).json({
     success: false,
