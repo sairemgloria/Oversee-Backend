@@ -1,5 +1,19 @@
 const department_admin = require("../models/departmentAdminModel");
 
+const countAllDepartmentAdmin = async (req, res, next) => {
+  try {
+    const count = await department_admin.countDocuments(); // this counts all entry data from db
+
+    res.status(200).json({
+      success: true,
+      message: "Department admin count retrieved successfully!",
+      count,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getAllDepartmentAdmin = async (req, res) => {
   try {
     const deptAdmin = await department_admin.find();
@@ -232,6 +246,7 @@ const deleteDepartmentAdmin = async (req, res, next) => {
 };
 
 module.exports = {
+  countAllDepartmentAdmin,
   getAllDepartmentAdmin,
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,

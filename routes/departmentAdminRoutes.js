@@ -1,5 +1,6 @@
 const express = require("express");
 const {
+  countAllDepartmentAdmin,
   getAllDepartmentAdmin,
   getSelectedDepartmentAdmin,
   createDepartmentAdmin,
@@ -9,6 +10,7 @@ const {
 const router = express.Router();
 
 /* Routers */
+router.get("/count", countAllDepartmentAdmin);
 router.get("/", getAllDepartmentAdmin);
 router.get("/:id", getSelectedDepartmentAdmin);
 router.post("/", createDepartmentAdmin);
