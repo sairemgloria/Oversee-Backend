@@ -5,39 +5,25 @@ const dotenv = require("dotenv").config();
 
 /* Register */
 const registerAdmin = async (req, res) => {
+  // Get input fields from request body
+  const { name, email, password, type } = req.body;
+
   try {
-    // Get email and password from request body
-    const { email, name, password, type } = req.body;
+    /* Validation Check input fields. */
+    if (!name || !email || !password || !type) {
+      let missingFields = []; // Store missing fields.
 
-    // Check if name is provided
-    if (!name) {
+      if (!name) missingFields.push("Name");
+      if (!email) missingFields.push("Email");
+      if (!password) missingFields.push("Password");
+      if (!type) missingFields.push("Type");
+
+      // Display missing field(s)
       return res.status(400).json({
         success: false,
-        message: "Name is required.",
-      });
-    }
-
-    // Check if email is provided
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required.",
-      });
-    }
-
-    // Check if password is provided
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: "Password is required.",
-      });
-    }
-
-    // Check if type is provided
-    if (!type) {
-      return res.status(400).json({
-        success: false,
-        message: "Account type is required.",
+        message: `${missingFields.join(", ")} ${
+          missingFields.length > 1 ? "are" : "is"
+        } required`,
       });
     }
 
@@ -46,7 +32,8 @@ const registerAdmin = async (req, res) => {
     if (existingAdmin) {
       return res.status(400).json({
         success: false,
-        message: "Admin already exists.",
+        message:
+          "Admin with this email is already exist. Please provide another.",
       });
     }
 
