@@ -13,7 +13,7 @@ const app = express();
 app.use(
   cors({
     /* Allow requests from this origin */
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
 
     /* Allowed HTTP methods */
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -28,6 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* Routes */
+app.use("/api/auth", require("./routes/adminAuth"));
 app.use("/api/admins", require("./routes/adminRoutes"));
 app.use("/api/departmentAdmins", require("./routes/departmentAdminRoutes"));
 
