@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs");
 const Admin = require("../models/adminModel");
 
 const getAllAdmin = async (req, res) => {
@@ -63,10 +64,11 @@ const getSelectedAdmin = async (req, res) => {
 };
 
 const createAdmin = async (req, res, next) => {
+  // Get input fields from request body
   const { name, email, password, type } = req.body;
 
   try {
-    /* Validation: Check input fields. */
+    /* Validation Check input fields. */
     if (!name || !email || !password || !type) {
       let missingFields = []; // Store missing fields.
 
@@ -75,6 +77,7 @@ const createAdmin = async (req, res, next) => {
       if (!password) missingFields.push("Password");
       if (!type) missingFields.push("Type");
 
+      // Display missing field(s)
       return res.status(400).json({
         success: false,
         message: `${missingFields.join(", ")} ${
@@ -83,17 +86,17 @@ const createAdmin = async (req, res, next) => {
       });
     }
 
-    /* Check if Admin Existing (Email) */
+    // Check if admin already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
-      return res.status(409).json({
+      return res.status(400).json({
         success: false,
         message:
           "Admin with this email is already exist. Please provide another.",
       });
     }
 
-    /* Business Logic */
+    // Create new admin
     const admin = await Admin.create({
       name,
       email,
@@ -101,7 +104,7 @@ const createAdmin = async (req, res, next) => {
       type,
     });
 
-    /* Create Condition */
+    // Check if admin is created
     if (admin) {
       return res.status(201).json({
         success: true,
@@ -115,7 +118,7 @@ const createAdmin = async (req, res, next) => {
       });
     }
   } catch (err) {
-    /* Display Errors in Middleware */
+    /* Display error in middleware */
     next(err);
   }
 };
@@ -124,6 +127,7 @@ const updateAdmin = async (req, res, next) => {
   const { id } = req.params;
   const { name, email, oldPassword, newPassword, type } = req.body;
 
+  // ✅ Validate Admin ID format
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
@@ -132,8 +136,8 @@ const updateAdmin = async (req, res, next) => {
   }
 
   try {
+    // ✅ Find Admin
     const admin = await Admin.findById(id);
-
     if (!admin) {
       return res.status(404).json({
         success: false,
@@ -141,9 +145,14 @@ const updateAdmin = async (req, res, next) => {
       });
     }
 
-    let updateData = { name, email, type };
+    let updateData = {}; // object to store updated data
 
-    // ✅ Require Old Password if a New Password is Provided
+    // ✅ Update fields only if provided
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (type) updateData.type = type;
+
+    // ✅ If New Password is Provided, Validate and Hash it
     if (newPassword) {
       if (!oldPassword) {
         return res.status(400).json({
@@ -152,15 +161,16 @@ const updateAdmin = async (req, res, next) => {
         });
       }
 
-      // ✅ Check if the old password matches the stored password
-      if (admin.password !== oldPassword) {
+      // ✅ Compare old password with hashed password in DB
+      const isMatch = await bcrypt.compare(oldPassword, admin.password);
+      if (!isMatch) {
         return res.status(400).json({
           success: false,
           message: "Old password is incorrect.",
         });
       }
 
-      // ✅ Validate New Password Length
+      // ✅ Validate new password length
       if (newPassword.trim().length < 6) {
         return res.status(400).json({
           success: false,
@@ -168,10 +178,11 @@ const updateAdmin = async (req, res, next) => {
         });
       }
 
-      // ✅ Set New Password
-      updateData.password = newPassword;
+      // ✅ Hash the new password before updating
+      updateData.password = await bcrypt.hash(newPassword, 10);
     }
 
+    // ✅ Update the admin
     const updatedAdmin = await Admin.findByIdAndUpdate(id, updateData, {
       new: true,
     }).select("-password"); // 👈 Exclude password from response

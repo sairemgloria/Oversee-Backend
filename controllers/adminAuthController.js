@@ -3,75 +3,6 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/adminModel");
 const dotenv = require("dotenv").config();
 
-/* Register */
-const registerAdmin = async (req, res) => {
-  // Get input fields from request body
-  const { name, email, password, type } = req.body;
-
-  try {
-    /* Validation Check input fields. */
-    if (!name || !email || !password || !type) {
-      let missingFields = []; // Store missing fields.
-
-      if (!name) missingFields.push("Name");
-      if (!email) missingFields.push("Email");
-      if (!password) missingFields.push("Password");
-      if (!type) missingFields.push("Type");
-
-      // Display missing field(s)
-      return res.status(400).json({
-        success: false,
-        message: `${missingFields.join(", ")} ${
-          missingFields.length > 1 ? "are" : "is"
-        } required`,
-      });
-    }
-
-    // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ email });
-    if (existingAdmin) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Admin with this email is already exist. Please provide another.",
-      });
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new admin
-    const admin = new Admin({
-      name,
-      email,
-      password: hashedPassword,
-      type,
-    });
-
-    // Save admin
-    await admin.save();
-
-    // Send response
-    res.status(201).json({
-      success: true,
-      admin: {
-        adminId: admin._id,
-        name: admin.name,
-        email: admin.email,
-        password: admin.password,
-        type: admin.type,
-      },
-    });
-  } catch (err) {
-    // Display error message
-    console.error(err);
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
-
 /* Login */
 const loginAdmin = async (req, res) => {
   try {
@@ -128,4 +59,4 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registerAdmin, loginAdmin };
+module.exports = { loginAdmin };
