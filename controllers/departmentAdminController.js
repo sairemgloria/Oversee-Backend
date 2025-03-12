@@ -1,10 +1,11 @@
+const bcrypt = require("bcryptjs");
 const department_admin = require("../models/departmentAdminModel");
 
 const countAllDepartmentAdmin = async (req, res, next) => {
   try {
     const count = await department_admin.countDocuments(); // this counts all entry data from db
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Department admin count retrieved successfully!",
       count,
@@ -41,17 +42,8 @@ const getAllDepartmentAdmin = async (req, res) => {
 };
 
 const getSelectedDepartmentAdmin = async (req, res) => {
-  const { id } = req.params;
-
-  /* Validate: Check ID Format */
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Department Admin ID",
-    });
-  }
-
   try {
+    const { id } = req.params; // Get request ID
     const deptAdmin = await department_admin.findById(id);
 
     /* Validaiton: Check if department admin exists */
@@ -145,21 +137,13 @@ const createDepartmentAdmin = async (req, res) => {
 };
 
 const updateDepartmentAdmin = async (req, res, next) => {
-  /* Get Request ID */
-  const { id } = req.params;
-
   /* Get all input field(s) */
   const { name, email, oldPassword, newPassword, type } = req.body;
 
-  /* Validate: Check ID Format */
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Department Admin ID",
-    });
-  }
-
   try {
+    /* Get Request ID */
+    const { id } = req.params;
+
     const deptAdmin = await department_admin.findById(id);
 
     if (!deptAdmin) {
@@ -169,7 +153,12 @@ const updateDepartmentAdmin = async (req, res, next) => {
       });
     }
 
-    let updateData = { name, email, type };
+    let updateData = {}; // object to store updated data
+
+    // ✅ Update fields only if provided
+    if (name) updateData.name = name;
+    if (email) updateData.email = email;
+    if (type) updateData.type = type;
 
     // ✅ Require Old Password if a New Password is Provided
     if (newPassword) {
@@ -180,8 +169,9 @@ const updateDepartmentAdmin = async (req, res, next) => {
         });
       }
 
-      // ✅ Check if the old password matches the stored password
-      if (deptAdmin.password !== oldPassword) {
+      // ✅ Compare old password with hashed password in DB
+      const isMatch = await bcrypt.compare(oldPassword, deptAdmin.password);
+      if (!isMatch) {
         return res.status(400).json({
           success: false,
           message: "Old password is incorrect.",
@@ -196,15 +186,15 @@ const updateDepartmentAdmin = async (req, res, next) => {
         });
       }
 
-      // ✅ Set New Password
-      updateData.password = newPassword;
+      // ✅ Hash the new password before updating
+      updateData.password = await bcrypt.hash(newPassword, 10);
     }
 
     const updatedDeptAdmin = await department_admin
       .findByIdAndUpdate(id, updateData, { new: true })
       .select("-password"); // 👈 Exclude password from response
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Department Admin updated successfully!",
       data: updatedDeptAdmin,
@@ -215,18 +205,10 @@ const updateDepartmentAdmin = async (req, res, next) => {
 };
 
 const deleteDepartmentAdmin = async (req, res, next) => {
-  /* Get Request ID */
-  const { id } = req.params;
-
-  /* Validation: Check ID Format */
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Department Admin ID",
-    });
-  }
-
   try {
+    /* Get Request ID */
+    const { id } = req.params;
+
     const deptAdmin = await department_admin.findByIdAndDelete(id);
 
     /* Validation: Check if admin exists. */
@@ -235,7 +217,8 @@ const deleteDepartmentAdmin = async (req, res, next) => {
       throw new Error("Department Admin not found.");
     }
 
-    res.status(200).json({
+    /* Success deletion of data */
+    return res.status(200).json({
       success: true,
       messsage: "Department Admin deleted successfully.",
     });
