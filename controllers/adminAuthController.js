@@ -45,7 +45,7 @@ const loginAdmin = async (req, res) => {
         adminId: admin._id,
         email: admin.email,
         password: admin.password,
-        role: admin.role,
+        type: admin.type,
       },
       token,
     });

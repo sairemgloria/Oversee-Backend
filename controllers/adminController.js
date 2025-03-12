@@ -124,8 +124,8 @@ const createAdmin = async (req, res, next) => {
 };
 
 const updateAdmin = async (req, res, next) => {
-  const { id } = req.params;
-  const { name, email, oldPassword, newPassword, type } = req.body;
+  const { id } = req.params; // Get Admin ID from request params
+  const { name, email, oldPassword, newPassword, type } = req.body; // Get fields to update
 
   // ✅ Validate Admin ID format
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
