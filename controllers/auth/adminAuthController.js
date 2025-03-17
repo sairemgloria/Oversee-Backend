@@ -9,6 +9,19 @@ const loginAdmin = async (req, res) => {
     // Get email and password from request body
     const { email, password } = req.body;
 
+    // Check if email and password are provided
+    if (!email || !password) {
+      let missingFields = []; // store missing fields
+      if (!email) missingFields.push("email");
+      if (!password) missingFields.push("password");
+      return res.status(400).json({
+        success: false,
+        message: `${missingFields.join(", ")} ${
+          missingFields.length > 1 ? "are" : "is"
+        } required`,
+      });
+    }
+
     // Check if email is provided
     const admin = await Admin.findOne({ email });
 
@@ -39,7 +52,7 @@ const loginAdmin = async (req, res) => {
     );
 
     // Send response
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       admin: {
         adminId: admin._id,
