@@ -6,7 +6,7 @@ const {
   createDepartmentAdmin,
   updateDepartmentAdmin,
   deleteDepartmentAdmin,
-} = require("../controllers/departmentAdminController");
+} = require("../../controllers/admin/departmentAdminController");
 const router = express.Router();
 
 /* ################# */

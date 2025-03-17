@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const department_admin = require("../models/departmentAdminModel");
+const department_admin = require("../../models/admin/departmentAdminModel");
 
 const countAllDepartmentAdmin = async (req, res, next) => {
   try {
@@ -46,7 +46,7 @@ const getSelectedDepartmentAdmin = async (req, res) => {
     const { id } = req.params; // Get request ID
     const deptAdmin = await department_admin.findById(id);
 
-    /* Validaiton: Check if department admin exists */
+    /* Validation: Check if department admin exists */
     if (!deptAdmin) {
       return res.status(404).json({
         success: false,

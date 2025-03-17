@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const Admin = require("../models/adminModel");
+const Admin = require("../../models/admin/adminModel");
 
 const getAllAdmin = async (req, res) => {
   try {
@@ -28,17 +28,8 @@ const getAllAdmin = async (req, res) => {
 };
 
 const getSelectedAdmin = async (req, res) => {
-  const { id } = req.params;
-
-  /* Validate: Check ID Format */
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Admin ID",
-    });
-  }
-
   try {
+    const { id } = req.params; // Get request ID
     const admin = await Admin.findById(id);
 
     /* Validation: Check if admin exists. */
@@ -124,20 +115,15 @@ const createAdmin = async (req, res, next) => {
 };
 
 const updateAdmin = async (req, res, next) => {
-  const { id } = req.params; // Get Admin ID from request params
-  const { name, email, oldPassword, newPassword, type } = req.body; // Get fields to update
-
-  // ✅ Validate Admin ID format
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Admin ID",
-    });
-  }
+  /* Get all input field(s) */
+  const { name, email, oldPassword, newPassword, type } = req.body;
 
   try {
+    const { id } = req.params; // Get Admin ID from request params
+
     // ✅ Find Admin
     const admin = await Admin.findById(id);
+
     if (!admin) {
       return res.status(404).json({
         success: false,
@@ -187,7 +173,7 @@ const updateAdmin = async (req, res, next) => {
       new: true,
     }).select("-password"); // 👈 Exclude password from response
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Admin profile updated successfully!",
       data: updatedAdmin,
@@ -198,18 +184,10 @@ const updateAdmin = async (req, res, next) => {
 };
 
 const deleteAdmin = async (req, res, next) => {
-  /* Get Request ID */
-  const { id } = req.params;
-
-  /* Validation: Check ID Format */
-  if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Admin ID",
-    });
-  }
-
   try {
+    /* Get Request ID */
+    const { id } = req.params;
+
     const admin = await Admin.findByIdAndDelete(id);
 
     /* Validation: Check if admin exists. */
@@ -218,7 +196,8 @@ const deleteAdmin = async (req, res, next) => {
       throw new Error("Admin not found");
     }
 
-    res.status(200).json({
+     /* Success deletion of data */
+    return res.status(200).json({
       success: true,
       message: "Admin deleted successfully",
     });

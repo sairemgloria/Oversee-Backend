@@ -28,9 +28,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* Routes */
-app.use("/api/auth", require("./routes/adminAuth"));
-app.use("/api/admins", require("./routes/adminRoutes"));
-app.use("/api/departmentAdmins", require("./routes/departmentAdminRoutes"));
+app.use("/api/auth", require("./routes/admin/adminAuth"));
+app.use("/api/admins", require("./routes/admin/adminRoutes"));
+app.use("/api/departmentAdmins", require("./routes/admin/departmentAdminRoutes"));
 
 /* Error Handler */
 app.use(errorHandler);
