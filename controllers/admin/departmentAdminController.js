@@ -1,5 +1,9 @@
 const bcrypt = require("bcryptjs");
 const department_admin = require("../../models/admin/departmentAdminModel");
+const {
+  isValidEmail,
+  getMissingFields,
+} = require("../../utils/admin/validationUtils");
 
 const countAllDepartmentAdmin = async (req, res, next) => {
   try {
@@ -68,27 +72,29 @@ const getSelectedDepartmentAdmin = async (req, res) => {
   }
 };
 
-const createDepartmentAdmin = async (req, res) => {
-  /* Get all input fields based on model and on frontend form */
-  const { name, email, password, type } = req.body;
-
+const createDepartmentAdmin = async (req, res, next) => {
   try {
-    /* Validation: Check input fields */
-    if (!name || !email || !password || !type) {
-      let missingFields = []; // Store to an empty array all the missing fields.
+    /* Get all input fields based on model and on frontend form */
+    const { name, email, password, type } = req.body;
 
-      /* Push this message to the backend api to get which field(s) is empty. */
-      if (!name) missingFields.push("Name");
-      if (!email) missingFields.push("Email");
-      if (!password) missingFields.push("Password");
-      if (!type) missingFields.push("Type");
+    /* Check for missing fields */
+    const missingFields = getMissingFields({ name, email, password, type });
 
-      /* Return this message for the validation of input field(s) */
+    /* Display missing field(s) validation */
+    if (missingFields.length) {
       return res.status(400).json({
         success: false,
         message: `${missingFields.join(", ")} ${
           missingFields.length > 1 ? "are" : "is"
-        } required`,
+        } required.`,
+      });
+    }
+
+    /* Validation: Check if email format is valid */
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format. Please enter a valid email.",
       });
     }
 
@@ -98,11 +104,11 @@ const createDepartmentAdmin = async (req, res) => {
       return res.status(409).json({
         success: false,
         message:
-          "Department Admin with this email is already exist. Please provide another.",
+          "Department Admin with this email already exists. Please use another email.",
       });
     }
 
-    /* Business Logic */
+    /* Create new Department Admin */
     const deptAdmin = await department_admin.create({
       name,
       email,
@@ -110,29 +116,14 @@ const createDepartmentAdmin = async (req, res) => {
       type,
     });
 
-    /* Create Condition */
-    if (deptAdmin) {
-      return res.status(201).json({
-        success: true,
-        message: "Department Admin created successfully",
-        data: deptAdmin,
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Department Admin not created",
-      });
-    }
-  } catch (error) {
-    /* Display Error Message */
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        errors: Object.values(error.errors).map((err) => err.message),
-      });
-    }
-
-    console.error("Server Error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    return res.status(201).json({
+      success: true,
+      message: "Department Admin created successfully.",
+      data: deptAdmin,
+    });
+  } catch (err) {
+    /* Display error in middleware */
+    next(err);
   }
 };
 

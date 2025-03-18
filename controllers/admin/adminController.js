@@ -1,5 +1,9 @@
 const bcrypt = require("bcryptjs");
 const Admin = require("../../models/admin/adminModel");
+const {
+  isValidEmail,
+  getMissingFields,
+} = require("../../utils/admin/validationUtils");
 
 const getAllAdmin = async (req, res) => {
   try {
@@ -55,39 +59,42 @@ const getSelectedAdmin = async (req, res) => {
 };
 
 const createAdmin = async (req, res, next) => {
-  // Get input fields from request body
-  const { name, email, password, type } = req.body;
-
   try {
-    /* Validation Check input fields. */
-    if (!name || !email || !password || !type) {
-      let missingFields = []; // Store missing fields.
+    /* Get all input fields based on model and on frontend form */
+    const { name, email, password, type } = req.body;
 
-      if (!name) missingFields.push("Name");
-      if (!email) missingFields.push("Email");
-      if (!password) missingFields.push("Password");
-      if (!type) missingFields.push("Type");
+    /* Check for missing fields */
+    const missingFields = getMissingFields({ name, email, password, type });
 
-      // Display missing field(s)
+    /* Display missing field(s) validation */
+    if (missingFields.length) {
       return res.status(400).json({
         success: false,
         message: `${missingFields.join(", ")} ${
           missingFields.length > 1 ? "are" : "is"
-        } required`,
+        } required.`,
       });
     }
 
-    // Check if admin already exists
+    /* Validation: Check if email format is valid */
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format. Please enter a valid email.",
+      });
+    }
+
+    /* Validation: Check if admin email already exists */
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
-      return res.status(400).json({
+      return res.status(409).json({
         success: false,
         message:
           "Admin with this email is already exist. Please provide another.",
       });
     }
 
-    // Create new admin
+    /* Create new Admin */
     const admin = await Admin.create({
       name,
       email,
@@ -95,19 +102,11 @@ const createAdmin = async (req, res, next) => {
       type,
     });
 
-    // Check if admin is created
-    if (admin) {
-      return res.status(201).json({
-        success: true,
-        message: "Admin created successfully",
-        data: admin,
-      });
-    } else {
-      return res.status(400).json({
-        success: false,
-        message: "Admin not created",
-      });
-    }
+    return res.status(201).json({
+      success: true,
+      message: "Admin created successfully",
+      data: admin,
+    });
   } catch (err) {
     /* Display error in middleware */
     next(err);
@@ -196,7 +195,7 @@ const deleteAdmin = async (req, res, next) => {
       throw new Error("Admin not found");
     }
 
-     /* Success deletion of data */
+    /* Success deletion of data */
     return res.status(200).json({
       success: true,
       message: "Admin deleted successfully",
