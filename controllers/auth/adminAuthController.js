@@ -1,31 +1,43 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Admin = require("../../models/admin/adminModel");
+const {
+  isValidEmail,
+  getMissingFields,
+} = require("../../utils/admin/validationUtils");
 const dotenv = require("dotenv").config();
 
 /* Login */
-const loginAdmin = async (req, res) => {
+const loginAdmin = async (req, res, next) => {
   try {
-    // Get email and password from request body
+    /* Get email and password from request body */
     const { email, password } = req.body;
 
-    // Check if email and password are provided
-    if (!email || !password) {
-      let missingFields = []; // store missing fields
-      if (!email) missingFields.push("email");
-      if (!password) missingFields.push("password");
+    /* Check for missing fields */
+    const missingFields = getMissingFields({ email, password });
+
+    /* Display missing field(s) validation */
+    if (missingFields.length) {
       return res.status(400).json({
         success: false,
         message: `${missingFields.join(", ")} ${
           missingFields.length > 1 ? "are" : "is"
-        } required`,
+        } required.`,
       });
     }
 
-    // Check if email is provided
+    /* Validation: Check if email format is valid */
+    if (!isValidEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format. Please enter a valid email.",
+      });
+    }
+
+    /* Validation: Check if email is provided */
     const admin = await Admin.findOne({ email });
 
-    // If admin is not found
+    /* Validation: If admin or credential is not found */
     if (!admin) {
       return res.status(400).json({
         success: false,
@@ -33,7 +45,7 @@ const loginAdmin = async (req, res) => {
       });
     }
 
-    // Compare password and check credentials
+    /* Compare password and check credentials */
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -42,7 +54,7 @@ const loginAdmin = async (req, res) => {
       });
     }
 
-    // Generate token
+    /* Generate token */
     const token = jwt.sign(
       { adminId: admin._id, email: admin.email },
       process.env.JWT_SECRET,
@@ -51,11 +63,11 @@ const loginAdmin = async (req, res) => {
       }
     );
 
-    // Send response
+    /* Send response */
     return res.status(200).json({
       success: true,
       admin: {
-        adminId: admin._id,
+        id: admin._id,
         email: admin.email,
         password: admin.password,
         type: admin.type,
@@ -63,12 +75,8 @@ const loginAdmin = async (req, res) => {
       token,
     });
   } catch (err) {
-    // Display error message
-    console.error(err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    /* Display error message */
+    next(err);
   }
 };
 
