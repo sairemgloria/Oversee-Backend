@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", require("./routes/auth/adminAuth"));
 app.use("/api/admins", require("./routes/admin/adminRoutes"));
 app.use("/api/departmentAdmins", require("./routes/admin/departmentAdminRoutes"));
+app.use("/api/roles", require("./routes/admin/roleRoutes"));
 
 /* Error Handler */
 app.use(errorHandler);
