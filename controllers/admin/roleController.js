@@ -101,4 +101,77 @@ const createRole = async (req, res, next) => {
   }
 };
 
-module.exports = { countAllRoles, getAllRoles, getSelectedRole, createRole };
+const updateRole = async (req, res, next) => {
+  try {
+    const { id } = req.params; // Get request ID
+    const { name, codeId, permissions } = req.body;
+
+    /* Validation: Check if required fields are missing */
+    const missingFields = getMissingFields({ name, codeId, permissions });
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    /* Validation: Check if role exists */
+    const role = await Role.findById(id);
+    if (!role) {
+      return res.status(404).json({
+        success: false,
+        message: "Role not found",
+      });
+    }
+
+    /* Update role */
+    role.name = name;
+    role.codeId = codeId;
+    role.permissions = permissions;
+
+    /* Save updated role */
+    const updatedRole = await role.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Role updated successfully!",
+      data: updatedRole,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteRole = async (req, res, next) => {
+  try {
+    const { id } = req.params; // Get request ID
+    const role = await Role.findById(id);
+
+    /* Validation: Check if role exists */
+    if (!role) {
+      return res.status(404).json({
+        success: false,
+        message: "Role not found",
+      });
+    }
+
+    /* Delete role */
+    await role.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Role deleted successfully!",
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  countAllRoles,
+  getAllRoles,
+  getSelectedRole,
+  createRole,
+  updateRole,
+  deleteRole,
+};

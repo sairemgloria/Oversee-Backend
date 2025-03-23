@@ -4,6 +4,8 @@ const {
   getAllRoles,
   getSelectedRole,
   createRole,
+  updateRole,
+  deleteRole,
 } = require("../../controllers/admin/roleController");
 const router = express.Router();
 
@@ -47,5 +49,39 @@ router.get("/:id", (req, res, next) => {
 # Request Type: POST
 */
 router.post("/", createRole);
+
+/* 
+# Update Selected Role
+# Request Type: PUT
+*/
+router.put("/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Role ID",
+    });
+  }
+
+  return updateRole(req, res, next);
+});
+
+/* 
+# Delete Selected Role
+# Request Type: DELETE
+*/
+router.delete("/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Role ID",
+    });
+  }
+
+  return deleteRole(req, res, next);
+});
 
 module.exports = router;
