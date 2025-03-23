@@ -6,9 +6,9 @@ const roleSchema = new mongoose.Schema(
       type: String,
       required: [true, "Name is required"],
     },
-    roleIdCode: {
+    codeId: {
       type: String,
-      required: [true, "Description is required"],
+      required: [true, "Role code id is required"],
     },
     permissions: {
       type: [String],

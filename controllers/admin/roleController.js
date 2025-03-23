@@ -1,4 +1,5 @@
 const Role = require("../../models/admin/roleModel");
+const { getMissingFields } = require("../../utils/admin/validationUtils");
 
 const countAllRoles = async (req, res, next) => {
   try {
@@ -34,4 +35,47 @@ const getAllRoles = async (req, res, next) => {
   }
 };
 
-module.exports = { countAllRoles, getAllRoles };
+const createRole = async (req, res, next) => {
+  try {
+    /* Get all input fields based on the Role model */
+    const { name, codeId, permissions } = req.body;
+
+    /* Validation: Check if required fields are missing */
+    const missingFields = getMissingFields({ name, codeId, permissions });
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    /* Validation: Check if role name is existing */
+    const existingRole = await Role.findOne({ name });
+    if (existingRole) {
+      return res.status(400).json({
+        success: false,
+        message: "Role name already exists. Please provide another.",
+      });
+    }
+
+    /* Create new role */
+    const newRole = new Role({
+      name,
+      codeId,
+      permissions,
+    });
+
+    /* Save new role */
+    const role = await newRole.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "Role created successfully!",
+      data: role,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { countAllRoles, getAllRoles, createRole };
