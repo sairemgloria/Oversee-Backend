@@ -35,6 +35,29 @@ const getAllRoles = async (req, res, next) => {
   }
 };
 
+const getSelectedRole = async (req, res, next) => {
+  try {
+    const { id } = req.params; // Get request ID
+    const role = await Role.findById(id);
+
+    /* Validation: Check if role exists. */
+    if (!role) {
+      return res.status(404).json({
+        success: false,
+        message: "Role not found",
+      });
+    }
+
+    /* Business Logic */
+    return res.status(200).json({
+      success: true,
+      data: role,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createRole = async (req, res, next) => {
   try {
     /* Get all input fields based on the Role model */
@@ -78,4 +101,4 @@ const createRole = async (req, res, next) => {
   }
 };
 
-module.exports = { countAllRoles, getAllRoles, createRole };
+module.exports = { countAllRoles, getAllRoles, getSelectedRole, createRole };
