@@ -39,24 +39,39 @@ const loginAdmin = async (req, res, next) => {
 
     /* Validation: If admin or credential is not found */
     if (!admin) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
-        message: "Admin not found.",
+        message: "Invalid credentials.",
       });
     }
 
     /* Compare password and check credentials */
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "Invalid credentials.",
       });
     }
 
+    /* Validation: Check account type */
+    const allowedAdminTypes = process.env.ADMIN_ACC_TYPE.split(","); // Convert to array
+
+    /* For debugging purpose only */
+    // console.log("Admin Type:", admin.type);
+    // console.log("Allowed Admin Types:", allowedAdminTypes);
+    // console.log("Match Found:", allowedAdminTypes.includes(admin.type));
+
+    if (!allowedAdminTypes.includes(admin.type)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You are not authorized as an admin.",
+      });
+    }
+
     /* Generate token */
     const token = jwt.sign(
-      { adminId: admin._id, email: admin.email },
+      { adminId: admin._id, email: admin.email, type: admin.type },
       process.env.JWT_SECRET,
       {
         expiresIn: process.env.JWT_EXPIRES_IN,
