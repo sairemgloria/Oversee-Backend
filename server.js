@@ -30,7 +30,11 @@ app.use(express.urlencoded({ extended: true }));
 /* Routes */
 app.use("/api/auth", require("./routes/auth/adminAuth"));
 app.use("/api/admins", require("./routes/admin/adminRoutes"));
-app.use("/api/department-admins", require("./routes/admin/departmentAdminRoutes"));
+app.use(
+  "/api/department-admins",
+  require("./routes/admin/departmentAdminRoutes")
+);
+app.use("/api/departments", require("./routes/admin/departmentRoutes"));
 app.use("/api/roles", require("./routes/admin/roleRoutes"));
 
 /* Error Handler */

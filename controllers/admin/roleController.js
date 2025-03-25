@@ -64,7 +64,11 @@ const createRole = async (req, res, next) => {
     const { name, codeId, departmentDesignation } = req.body;
 
     /* Validation: Check if required fields are missing */
-    const missingFields = getMissingFields({ name, codeId, departmentDesignation });
+    const missingFields = getMissingFields({
+      name,
+      codeId,
+      departmentDesignation,
+    });
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -103,11 +107,27 @@ const createRole = async (req, res, next) => {
 
 const updateRole = async (req, res, next) => {
   try {
-    const { id } = req.params; // Get request ID
+    /* Get the ID for the request parameter */
+    const { id } = req.params;
+
+    /* Validation: Check if role id is existing */
+    const existingIdRole = await Role.findById(id);
+    if (!existingIdRole) {
+      return res.status(404).json({
+        success: false,
+        message: "Role ID not found",
+      });
+    }
+
+    /* Get all request from input fields based on model */
     const { name, codeId, departmentDesignation } = req.body;
 
     /* Validation: Check if required fields are missing */
-    const missingFields = getMissingFields({ name, codeId, departmentDesignation });
+    const missingFields = getMissingFields({
+      name,
+      codeId,
+      departmentDesignation,
+    });
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -115,29 +135,37 @@ const updateRole = async (req, res, next) => {
       });
     }
 
-    /* Validation: Check if role exists */
-    const role = await Role.findById(id);
-    if (!role) {
-      return res.status(404).json({
+    /* Validation: Check if role name is already existing */
+    const existingRoleName = await Role.findOne({ name });
+    if (existingRoleName) {
+      return res.status(400).json({
         success: false,
-        message: "Role not found",
+        message: "Role name already exists. Please provide another.",
       });
     }
 
-    /* Update role */
-    role.name = name;
-    role.codeId = codeId;
-    role.departmentDesignation = departmentDesignation;
+    let updateData = {}; // Create an empty object to store updated data
 
-    /* Save updated role */
-    const updatedRole = await role.save();
+    // Update fields only if provided
+    if (name) updateData.name = name;
+    if (codeId) updateData.codeId = codeId;
+    if (departmentDesignation)
+      updateData.departmentDesignation = departmentDesignation;
 
+    /* Find the selected role id and update its data */
+    const updatedRole = await Role.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    /* Return success response */
     return res.status(200).json({
       success: true,
       message: "Role updated successfully!",
       data: updatedRole,
     });
   } catch (err) {
+    /* Display error from middleware */
     next(err);
   }
 };

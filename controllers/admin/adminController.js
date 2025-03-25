@@ -120,13 +120,12 @@ const updateAdmin = async (req, res, next) => {
   try {
     const { id } = req.params; // Get Admin ID from request params
 
-    // ✅ Find Admin
+    /* Validation: Check if admin id is existing */
     const admin = await Admin.findById(id);
-
     if (!admin) {
       return res.status(404).json({
         success: false,
-        message: "Admin not found",
+        message: "Admin ID not found",
       });
     }
 
@@ -170,6 +169,7 @@ const updateAdmin = async (req, res, next) => {
     // ✅ Update the admin
     const updatedAdmin = await Admin.findByIdAndUpdate(id, updateData, {
       new: true,
+      runValidators: true,
     }).select("-password"); // 👈 Exclude password from response
 
     return res.status(200).json({
