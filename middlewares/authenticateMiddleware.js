@@ -6,7 +6,7 @@ const authenticate = (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: "No token provided.",
+      message: "Access Denied: No token provided - From authenticate middleware.",
     });
   }
 
