@@ -10,10 +10,10 @@ const roleSchema = new mongoose.Schema(
       type: String,
       required: [true, "Role code id is required"],
     },
-    permissions: {
-      type: [String],
-      required: [true, "Permissions are required"],
-    },
+    departmentDesignation: {
+      type: String,
+      required: [true, "Department Designation is required"],
+    }
   },
   {
     timestamps: true,

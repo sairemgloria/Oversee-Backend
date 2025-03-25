@@ -7,6 +7,8 @@ const {
   updateRole,
   deleteRole,
 } = require("../../controllers/admin/roleController");
+const authenticate = require("../../middlewares/authenticateMiddleware");
+const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
 /* ################# */
@@ -17,19 +19,19 @@ const router = express.Router();
 # Count All Roles
 # Request Type: GET
 */
-router.get("/count", countAllRoles);
+router.get("/count", authenticate, isAdmin, countAllRoles);
 
 /* 
 # Get All Roles
 # Request Type: GET
 */
-router.get("/", getAllRoles);
+router.get("/", authenticate, isAdmin, getAllRoles);
 
 /* 
 # Get Selected Role
 # Request Type: GET
 */
-router.get("/:id", (req, res, next) => {
+router.get("/:id", authenticate, isAdmin, (req, res, next) => {
   const { id } = req.params; // Get request ID
 
   /* Validation: Check if ID is missing or invalid ID format */
@@ -48,13 +50,13 @@ router.get("/:id", (req, res, next) => {
 # Create New Role
 # Request Type: POST
 */
-router.post("/", createRole);
+router.post("/", authenticate, isAdmin, createRole);
 
 /* 
 # Update Selected Role
 # Request Type: PUT
 */
-router.put("/:id", (req, res, next) => {
+router.put("/:id", authenticate, isAdmin, (req, res, next) => {
   const { id } = req.params;
 
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -71,7 +73,7 @@ router.put("/:id", (req, res, next) => {
 # Delete Selected Role
 # Request Type: DELETE
 */
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
   const { id } = req.params;
 
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {

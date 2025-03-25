@@ -20,10 +20,14 @@ const authenticate = (req, res, next) => {
     req.user = decoded; // Attach user data to request
     next(); // Proceed to the next middleware
   } catch (err) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid token. From Auth middleware.",
-    });
+    // return res.status(401).json({
+    //   success: false,
+    //   message: "Invalid token. From Auth middleware.",
+    // });
+    console.error("JWT Verification Error:", err.message);
+    const error = new Error("Unauthorized access. Invalid token. This is from authenticate middleware.");
+    res.status(401);
+    next(error); // Pass error to the centralized error handler
   }
 };
 

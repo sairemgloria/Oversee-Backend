@@ -61,10 +61,10 @@ const getSelectedRole = async (req, res, next) => {
 const createRole = async (req, res, next) => {
   try {
     /* Get all input fields based on the Role model */
-    const { name, codeId, permissions } = req.body;
+    const { name, codeId, departmentDesignation } = req.body;
 
     /* Validation: Check if required fields are missing */
-    const missingFields = getMissingFields({ name, codeId, permissions });
+    const missingFields = getMissingFields({ name, codeId, departmentDesignation });
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -85,7 +85,7 @@ const createRole = async (req, res, next) => {
     const newRole = new Role({
       name,
       codeId,
-      permissions,
+      departmentDesignation,
     });
 
     /* Save new role */
@@ -104,10 +104,10 @@ const createRole = async (req, res, next) => {
 const updateRole = async (req, res, next) => {
   try {
     const { id } = req.params; // Get request ID
-    const { name, codeId, permissions } = req.body;
+    const { name, codeId, departmentDesignation } = req.body;
 
     /* Validation: Check if required fields are missing */
-    const missingFields = getMissingFields({ name, codeId, permissions });
+    const missingFields = getMissingFields({ name, codeId, departmentDesignation });
     if (missingFields.length > 0) {
       return res.status(400).json({
         success: false,
@@ -127,7 +127,7 @@ const updateRole = async (req, res, next) => {
     /* Update role */
     role.name = name;
     role.codeId = codeId;
-    role.permissions = permissions;
+    role.departmentDesignation = departmentDesignation;
 
     /* Save updated role */
     const updatedRole = await role.save();

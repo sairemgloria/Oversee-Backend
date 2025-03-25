@@ -1,39 +1,21 @@
-const jwt = require("jsonwebtoken");
-
 const isAdmin = (req, res, next) => {
-  const token = req.header("Authorization");
-
-  if (!token) {
+  if (!req.user) {
     return res.status(401).json({
       success: false,
-      message: "Access denied. No token provided.",
+      message: "Unauthorized. Please log in.",
     });
   }
 
-  // Remove "Bearer " if present
-  const extractedToken = token.startsWith("Bearer ")
-    ? token.split(" ")[1]
-    : token;
+  const allowedAdminTypes = process.env.ADMIN_ACC_TYPE.split(",");
 
-  try {
-    const decoded = jwt.verify(extractedToken, process.env.JWT_SECRET); // Verify token
-    const allowedAdminTypes = process.env.ADMIN_ACC_TYPE.split(","); // Convert to array
-
-    if (!allowedAdminTypes.includes(decoded.type)) {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Admins only.",
-      });
-    }
-
-    req.user = decoded; // Attach user data to request
-    next(); // Proceed to the next middleware
-  } catch (error) {
-    return res.status(401).json({
+  if (!allowedAdminTypes.includes(req.user.type)) {
+    return res.status(403).json({
       success: false,
-      message: "Invalid token. From isAdmin middleware.",
+      mmessage: "Access denied. You are not authorized as an admin. This is from isAdmin middleware.",
     });
   }
+
+  next(); // ✅ Continue if checks pass
 };
 
 module.exports = isAdmin;

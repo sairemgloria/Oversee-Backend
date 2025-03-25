@@ -6,8 +6,8 @@ const {
   updateAdmin,
   deleteAdmin,
 } = require("../../controllers/admin/adminController");
-const isAdmin = require("../../middlewares/isAdminMiddleware");
 const authenticate = require("../../middlewares/authenticateMiddleware");
+const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
 /* ################# */

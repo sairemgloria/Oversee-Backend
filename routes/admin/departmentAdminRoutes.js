@@ -7,6 +7,8 @@ const {
   updateDepartmentAdmin,
   deleteDepartmentAdmin,
 } = require("../../controllers/admin/departmentAdminController");
+const authenticate = require("../../middlewares/authenticateMiddleware");
+const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
 /* ################# */
@@ -17,19 +19,19 @@ const router = express.Router();
 # Count All Department Admin
 # Request Type: GET
 */
-router.get("/count", countAllDepartmentAdmin);
+router.get("/count", authenticate, isAdmin, countAllDepartmentAdmin);
 
 /* 
 # Get All Department Admin
 # Request Type: GET
 */
-router.get("/", getAllDepartmentAdmin);
+router.get("/", authenticate, isAdmin, getAllDepartmentAdmin);
 
 /* 
 # Get Selected Department Admin
 # Request Type: GET
 */
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", authenticate, isAdmin, (req, res, next) => {
   /* Get request ID */
   const { id } = req.params;
 
@@ -49,13 +51,13 @@ router.get("/:id", async (req, res, next) => {
 # Create Department Admin
 # Request Type: POST
 */
-router.post("/", createDepartmentAdmin);
+router.post("/", authenticate, isAdmin, createDepartmentAdmin);
 
 /* 
 # Update Selected Department Admin
 # Request Type: PUT
 */
-router.put("/:id", async (req, res, next) => {
+router.put("/:id", authenticate, isAdmin, (req, res, next) => {
   /* Get request ID */
   const { id } = req.params;
 
@@ -75,7 +77,7 @@ router.put("/:id", async (req, res, next) => {
 # Delete Selected Department Admin
 # Request Type: DELETE
 */
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
   /* Get request ID */
   const { id } = req.params;
 
