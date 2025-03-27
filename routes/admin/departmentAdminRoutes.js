@@ -11,86 +11,68 @@ const authenticate = require("../../middlewares/authenticateMiddleware");
 const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
-/* ################# */
-/* # Routers Lists # */
-/* ################# */
+/* Router List */
 
-/* 
-# Count All Department Admin
-# Request Type: GET
-*/
+// Count All Department Admin
 router.get("/count", authenticate, isAdmin, countAllDepartmentAdmin);
 
-/* 
-# Get All Department Admin
-# Request Type: GET
-*/
+// Get All Department Admin
 router.get("/", authenticate, isAdmin, getAllDepartmentAdmin);
 
-/* 
-# Get Selected Department Admin
-# Request Type: GET
-*/
-router.get("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
-
-  /* Validate: Check if id is missing or invalid id format */
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid or missing Department Admin ID.",
-    });
-  }
-
-  /* Call the actual get function */
-  return getSelectedDepartmentAdmin(req, res, next);
-});
-
-/* 
-# Create Department Admin
-# Request Type: POST
-*/
+// Create Department Admin
 router.post("/", authenticate, isAdmin, createDepartmentAdmin);
 
-/* 
-# Update Selected Department Admin
-# Request Type: PUT
-*/
+// Update Selected Department Admin
 router.put("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
+  const { id } = req.params; // Get request ID
 
-  /* Validate: Check if id is missing or invalid id format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing Department Admin ID.",
+      message: "Invalid Department Admin ID Format.",
     });
   }
 
-  /* Call the actual update function */
-  return updateDepartmentAdmin(req, res, next);
+  return updateDepartmentAdmin(req, res, next); // Call the actual get function
 });
 
-/* 
-# Delete Selected Department Admin
-# Request Type: DELETE
-*/
+// Delete Selected Department Admin
 router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
+  const { id } = req.params; // Get request ID
 
-  /* Validate: Check if id is missing or invalid id format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing Department Admin ID.",
+      message: "Invalid Department Admin ID Format.",
     });
   }
 
-  /* Call the actual delete function */
-  return deleteDepartmentAdmin(req, res, next);
+  return deleteDepartmentAdmin(req, res, next); // Call the actual get function
+});
+
+// Get Selected Department Admin
+router.get("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Department Admin ID Format.",
+    });
+  }
+
+  return getSelectedDepartmentAdmin(req, res, next); // Call the actual get function
+});
+
+// Handle Undefined Routes Within /api/department-admins
+router.use("*", (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found.",
+  });
 });
 
 module.exports = router;

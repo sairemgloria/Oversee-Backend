@@ -11,79 +11,69 @@ const authenticate = require("../../middlewares/authenticateMiddleware");
 const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
-/* ################# */
-/* # Routers Lists # */
-/* ################# */
+/* Router List */
 
-/* 
-# Count All Departments
-# Request Type: GET
-*/
+// Count All Departments
 router.get("/count", authenticate, isAdmin, countAllDepartments);
 
-/* 
-# Get All Departments
-# Request Type: GET
-*/
+// Get All Departments
 router.get("/", authenticate, isAdmin, getAllDepartments);
 
-/* 
-# Get Selected Department
-# Request Type: GET
-*/
-router.get("/:id", authenticate, isAdmin, (req, res, next) => {
+// Create New Department
+router.post("/", authenticate, isAdmin, createDepartment);
+
+// Update Selected Department
+router.put("/:id", authenticate, isAdmin, (req, res, next) => {
   const { id } = req.params; // Get request ID
 
-  /* Validation: Check if ID is missing or invalid ID format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid Department ID",
+      message: "Invalid Department ID Format.",
+    });
+  }
+
+  return updateDepartment(req, res, next); // Call the actual get function
+});
+
+// Delete Selected Department
+router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Department ID Format.",
+    });
+  }
+
+  return deleteDepartment(req, res, next); // Call the actual get function
+});
+
+// Get Selected Department
+router.get("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Department ID Format.",
     });
   }
 
   /* Call the actual get function */
-  return getSelectedDepartment(req, res, next);
+  return getSelectedDepartment(req, res, next); // Call the actual get function
 });
 
-/* 
-# Create New Department
-# Request Type: POST
-*/
-router.post("/", authenticate, isAdmin, createDepartment);
-
-/* 
-# Update Selected Department
-# Request Type: PUT
-*/
-router.put("/:id", authenticate, isAdmin, (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Department ID",
-    });
-  }
-
-  return updateDepartment(req, res, next);
-});
-
-/* 
-# Delete Selected Department
-# Request Type: DELETE
-*/
-router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Department ID",
-    });
-  }
-
-  return deleteDepartment(req, res, next);
+// Handle Undefined Routes Within /api/departments
+router.use("*", (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found.",
+  });
 });
 
 module.exports = router;

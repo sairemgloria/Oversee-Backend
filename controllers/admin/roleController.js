@@ -38,6 +38,7 @@ const getAllRoles = async (req, res, next) => {
 const getSelectedRole = async (req, res, next) => {
   try {
     const { id } = req.params; // Get request ID
+
     const role = await Role.findById(id);
 
     /* Validation: Check if role exists. */

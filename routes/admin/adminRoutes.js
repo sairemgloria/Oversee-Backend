@@ -10,80 +10,66 @@ const authenticate = require("../../middlewares/authenticateMiddleware");
 const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
-/* ################# */
-/* # Routers Lists # */
-/* ################# */
+/* Router List */
 
-/* 
-# Get All Admin
-# Request Type: GET
-*/
+// Get All Admin
 router.get("/", authenticate, isAdmin, getAllAdmin);
 
-/* 
-# Get Selected Admin
-# Request Type: GET
-*/
-router.get("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
-
-  /* Validation: Check if ID is mising or invalid format */
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Admin ID",
-    });
-  }
-
-  /* Call the actual get function */
-  return getSelectedAdmin(req, res, next);
-});
-
-/* 
-# Create Admin
-# Request Type: POST
-*/
+// Create Admin
 router.post("/", authenticate, isAdmin, createAdmin);
+// router.post("/", createAdmin); // test only for no token authentication purpose please remove this later :)
 
-/* 
-# Update Selected Admin
-# Request Type: PUT
-*/
+// Update Selected Admin
 router.put("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
+  const { id } = req.params; // Get request ID
 
-  /* Validation: Check if ID is mising or invalid format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid Admin ID",
+      message: "Invalid ID Format.",
     });
   }
 
-  /* Call the actual update function */
-  return updateAdmin(req, res, next);
+  return updateAdmin(req, res, next); // Call the actual get function
 });
 
-/* 
-# Delete Selected Department Admin
-# Request Type: DELETE
-*/
+// Delete Selected Department Admin
 router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
-  /* Get request ID */
-  const { id } = req.params;
+  const { id } = req.params; // Get request ID
 
-  /* Validation: Check if ID is mising or invalid format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid Admin ID",
+      message: "Invalid ID Format.",
     });
   }
 
-  /* Call the actual delete function */
-  return deleteAdmin(req, res, next);
+  return deleteAdmin(req, res, next); // Call the actual get function
+});
+
+// Get Selected Admin
+router.get("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ID Format.",
+    });
+  }
+
+  return getSelectedAdmin(req, res, next); // Call the actual get function
+});
+
+// Handle Undefined Routes Within /api/admins
+router.use("*", (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found.",
+  });
 });
 
 module.exports = router;

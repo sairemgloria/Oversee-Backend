@@ -11,79 +11,68 @@ const authenticate = require("../../middlewares/authenticateMiddleware");
 const isAdmin = require("../../middlewares/isAdminMiddleware");
 const router = express.Router();
 
-/* ################# */
-/* # Routers Lists # */
-/* ################# */
+/* Router List */
 
-/* 
-# Count All Roles
-# Request Type: GET
-*/
+// Count All Roles
 router.get("/count", authenticate, isAdmin, countAllRoles);
 
-/* 
-# Get All Roles
-# Request Type: GET
-*/
+//Get All Roles
 router.get("/", authenticate, isAdmin, getAllRoles);
 
-/* 
-# Get Selected Role
-# Request Type: GET
-*/
+// Create New Role
+router.post("/", authenticate, isAdmin, createRole);
+
+// Update Selected Role
+router.put("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ID Format.",
+    });
+  }
+
+  return updateRole(req, res, next); // Call the actual get function
+});
+
+// Delete Selected Role
+router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
+  const { id } = req.params; // Get request ID
+
+  // Validation: Check ID if missing or invalid format
+  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid ID Format.",
+    });
+  }
+
+  return deleteRole(req, res, next); // Call the actual get function
+});
+
+// Get Selected Role
 router.get("/:id", authenticate, isAdmin, (req, res, next) => {
   const { id } = req.params; // Get request ID
 
-  /* Validation: Check if ID is missing or invalid ID format */
+  // Validation: Check ID if missing or invalid format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid Role ID",
+      message: "Invalid ID Format.",
     });
   }
 
-  /* Call the actual get function */
-  return getSelectedRole(req, res, next);
+  return getSelectedRole(req, res, next); // Call the actual get function
 });
 
-/* 
-# Create New Role
-# Request Type: POST
-*/
-router.post("/", authenticate, isAdmin, createRole);
-
-/* 
-# Update Selected Role
-# Request Type: PUT
-*/
-router.put("/:id", authenticate, isAdmin, (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Role ID",
-    });
-  }
-
-  return updateRole(req, res, next);
-});
-
-/* 
-# Delete Selected Role
-# Request Type: DELETE
-*/
-router.delete("/:id", authenticate, isAdmin, (req, res, next) => {
-  const { id } = req.params;
-
-  if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Role ID",
-    });
-  }
-
-  return deleteRole(req, res, next);
+// Handle Undefined Routes Within /api/roles
+router.use("*", (req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found.",
+  });
 });
 
 module.exports = router;
