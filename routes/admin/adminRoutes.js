@@ -16,7 +16,7 @@ const router = express.Router();
 router.get("/", authenticate, isAdmin, getAllAdmin);
 
 // Create Admin
-router.post("/", authenticate, isAdmin, createAdmin);
+router.post("/", authenticate, isAdmin, createAdmin); // default for authentication and jwt purpose
 // router.post("/", createAdmin); // test only for no token authentication purpose please remove this later :)
 
 // Update Selected Admin
