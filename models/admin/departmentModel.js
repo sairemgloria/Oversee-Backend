@@ -49,13 +49,13 @@ departmentSchema.virtual("datePHT").get(function () {
   return moment(this.date).tz("Asia/Manila").format("YYYY-MM-DD HH:mm:ss");
 });
 departmentSchema.virtual("timeInPHT").get(function () {
-  return moment(this.timeIn).tz("Asia/Manila").format("YYYY-MM-DD HH:mm:ss");
+  return moment(this.timeIn).tz("Asia/Manila").format("HH:mm:ss");
 });
 departmentSchema.virtual("timeOutPHT").get(function () {
-  return moment(this.timeOut).tz("Asia/Manila").format("YYYY-MM-DD HH:mm:ss");
+  return moment(this.timeOut).tz("Asia/Manila").format("HH:mm:ss");
 });
 departmentSchema.virtual("overtimePHT").get(function () {
-  return moment(this.overtime).tz("Asia/Manila").format("YYYY-MM-DD HH:mm:ss");
+  return moment(this.overtime).tz("Asia/Manila").format("HH:mm:ss");
 });
 
 module.exports = mongoose.model("Department", departmentSchema);
