@@ -49,7 +49,7 @@ const getSelectedDepartment = async (req, res, next) => {
       });
     }
 
-    /* Bbusiness Logid */
+    /* Business Logic */
     return res.status(200).json({
       success: true,
       data: department,
